@@ -61,6 +61,8 @@ class Web:
         self.app.router.add_route('POST', '/stopdiscoverable', self.stop_discoverable)
         self.app.router.add_route('GET', '/hiddevices', self.get_hid_devices_handler)
         self.app.router.add_route('GET', '/bluetoothdevices', self.get_bluetooth_devices)
+        self.app.router.add_route('GET', '/changebluetoothhost', self.change_bluetooth_host)
+        self.app.router.add_route('GET', '/getbluetoothhost', self.get_bluetooth_host)
         self.app.router.add_routes([web.get('/ws', self.websocket_handler)])
         self.app.router.add_static('/',"web/")# add_routes([web.get('/', self.hello)])
 
@@ -189,6 +191,15 @@ class Web:
     async def get_bluetooth_devices(self, request):
         await check_authorized(request)
         return web.Response(text=json.dumps(self.adapter.get_devices()))
+
+    async def get_bluetooth_host(self, request):
+        await check_authorized(request)
+        return web.Response(text=self.bluetooth_devices.connected_hosts[self.bluetooth_devices.current_host_index].name)
+
+    async def change_bluetooth_host(self, request):
+        await check_authorized(request)
+        self.bluetooth_devices.switch_host()
+        return web.Response(text=self.bluetooth_devices.connected_hosts[self.bluetooth_devices.current_host_index].name)
 
     async def on_agent_action(self, msg):
         for ws in self.ws:

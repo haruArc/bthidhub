@@ -67,6 +67,7 @@ class Main{
         $('#stopDiscoverableButton').on('click', e => {that.changeDiscoverableMode(false);});
         $('#restartServiceButton').on('click', e => {that.restartService();});
         $('#rebootButton').on('click', e => {that.rebootRaspberry();});
+        $('#changeHost').on('click', e => {that.changeHost();});
 
         this.scanning = false;
         this.setScanningState();
@@ -82,6 +83,7 @@ class Main{
         this.updateListOfBluetoothDevices();
         this.agent = new Agent(this);
         this.webSocketManager = new WebSocketManager(this.agent, this);
+        this.getHost();
     }
 
     updateHIDDevices(){
@@ -365,6 +367,32 @@ class Main{
         $.ajax({
             url: "http://" + location.hostname + ":8080/reboot",
             type: 'POST', cache:false, contentType: false, processData: false,
+            error: function (jqXHR, textStatus, errorThrown){
+                M.toast({html: "Rebooting Raspberry, reload this page..."});
+            }
+        });
+    }
+
+    changeHost(){
+        $.ajax({
+            url: "http://" + location.hostname + ":8080/changebluetoothhost",
+            type: 'GET', cache:false, contentType: false, processData: false,
+            success: function (data, textStatus, jqXHR) {
+                $('#changeHost').html(data)
+            },
+            error: function (jqXHR, textStatus, errorThrown){
+                M.toast({html: "Rebooting Raspberry, reload this page..."});
+            }
+        });
+    }
+
+    getHost(){
+        $.ajax({
+            url: "http://" + location.hostname + ":8080/getbluetoothhost",
+            type: 'GET', cache:false, contentType: false, processData: false,
+            success: function (data, textStatus, jqXHR) {
+                $('#changeHost').html(data)
+            },
             error: function (jqXHR, textStatus, errorThrown){
                 M.toast({html: "Rebooting Raspberry, reload this page..."});
             }
