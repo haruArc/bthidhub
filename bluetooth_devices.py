@@ -233,6 +233,13 @@ class BluetoothDeviceRegistry:
         device.finalise()
         del device
 
+    def switch_host_by_object_path(self, device_object_path: str) -> None:
+        if device_object_path not in self.all:
+            return  # No such device
+        device = self.all[device_object_path]
+        if device.is_host:
+            self.current_host_index = self.connected_hosts.index(device)
+
     def switch_host(self) -> None:
         self.current_host_index = (self.current_host_index + 1) % len(self.connected_hosts)
 

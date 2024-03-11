@@ -239,6 +239,8 @@ class Web:
                         self.loop.run_in_executor(self.executor, self.adapter.device_action, 'disconnect', data['device'])
                     elif data['msg'] == 'remove_device':
                         self.loop.run_in_executor(self.executor, self.adapter.remove_device, data['device'])
+                    elif data['msg'] == 'switch_host':
+                        self.loop.run_in_executor(self.executor, self.bluetooth_devices.switch_host_by_object_path, data['device'])
                     else:
                         pass
                         #await ws.send_json({'msg':'connected'})

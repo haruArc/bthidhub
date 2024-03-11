@@ -4,14 +4,21 @@ from typing import Optional
 
 class HIDMessageFilter:
     def filter_message_to_host(self, msg: bytes) -> Optional[bytes]:
-        if msg == b'\x01\x05\x00\x2b\x00\x00\x00\x00\x00' or msg == b'\x05\x00\x2b\x00\x00\x00\x00\x00':
-            print("host switch")
-            return b'\xff'
+        if len(msg) < 1:
+            return None
 
-        if len(msg) == 8:
-            return b'\xa1\x01' + msg
+        result_report = bytearray(msg)
+        print(bytes(result_report).hex())
 
-        return b'\xa1' + msg
+        if len(msg) == 9:
+            msg = msg[1:]
+
+        if msg[0] == 0x20:
+            if 0x3a <= msg[2] and msg[2] <= 0x45:
+                print("host switch")
+                return bytes([0xff, msg[2] - 0x03a])
+
+        return b'\xa1\x01' + msg
 
 
     def filter_message_from_host(self, msg: bytes) -> Optional[bytes]:

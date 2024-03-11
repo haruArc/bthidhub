@@ -257,8 +257,14 @@ class Main{
                         connectDisconnectButton = '<a class="waves-effect waves-light btn-small" device="'+device.path+'" name="disconnectDeviceButton">Disconnect</a>';
                     }
                     var host = '';
-                    if(device.host) host = ' Host';
-                    trHTML += '<tr><td>' + device.alias + ' (Paired'+host+')</td><td>' + device.address + '</td><td>'+connectDisconnectButton+' <a class="waves-effect waves-light btn-small red" device="'+device.path+'" name="removeDeviceButton">Remove</a></td></tr>';
+                    var changeButton = '';
+                    if(device.host) 
+		    {
+			host = ' Host';
+                        if(device.connected)
+                          changeButton = ' <a class="waves-effect wave-light btn-small blue" device="'+device.path+'" alias="'+device.alias+'"name="switchHostButton">Switch Host</a>'
+		    }
+                    trHTML += '<tr><td>' + device.alias + ' (Paired'+host+')</td><td>' + device.address + '</td><td>'+connectDisconnectButton+' <a class="waves-effect waves-light btn-small red" device="'+device.path+'" name="removeDeviceButton">Remove</a>' + changeButton+ '</td></tr>';
                 });
                 $.each(response.devices, function (i, device) {
                     if(device.paired) return;
@@ -276,6 +282,10 @@ class Main{
                 });
                 $('a[name=removeDeviceButton]').on('click', function (data) {
                     that.webSocketManager.sendMessage({'msg':'remove_device','device':$(this).attr("device")})
+                });
+                $('a[name=switchHostButton]').on('click', function (data) {
+                    that.webSocketManager.sendMessage({'msg':'switch_host','device':$(this).attr("device")})
+                    $('#changeHost').html($(this).attr("alias"))
                 });
                 if(!response.scanning){
                     that.scanning = false;

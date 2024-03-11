@@ -70,6 +70,9 @@ FILTER_INSTANCES = {
 "Default" : HIDMessageFilter(), "Mouse":MouseMessageFilter(), "A1314":A1314MessageFilter(), "G502":G502MessageFilter(), "MX510":MX510MessageFilter()
 }
 
+target_devices = [
+]
+
 class HIDDevice:
     def __init__(self, device: _Device, filter: HIDMessageFilter,
                  loop: asyncio.AbstractEventLoop, device_registry: HIDDeviceRegistry):
@@ -108,10 +111,13 @@ class HIDDevice:
         tm = self.filter.filter_message_to_host(msg)
         if tm is None or self.device_registry.bluetooth_devices is None:
             return
-        if tm == b'\xff':
+        if tm[0] == 0xff:
             self.device_registry.bluetooth_devices.send_message(b'\xa1\x01\x00\x00\x00\x00\x00\x00\x00\x00', True, False)
-            self.device_registry.bluetooth_devices.switch_host()
-            self.indicate_switch_with_mouse_movement()
+            if len(tm) == 1:
+              self.device_registry.bluetooth_devices.switch_host()
+              self.indicate_switch_with_mouse_movement()
+            elif tm[1] < len(target_devices):
+              self.device_registry.bluetooth_devices.switch_host_by_object_path(target_devices[tm[1]])
         else:
             self.device_registry.bluetooth_devices.send_message(tm, True, False)
 
