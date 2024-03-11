@@ -6,3 +6,4 @@ build/
 install/on_rpi/bluez/
 devices_config.json
 *~
+.mypy_cache/
